@@ -119,7 +119,23 @@ class FriendController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $input = $request->all();
+        $id = $input['id'];
+        $check = Friend::where('user_id',Auth::user()->id)->where('friend_id',$id)->exists();
+        $check2 = Friend::where('friend_id',Auth::user()->id)->where('user_id',$id)->exists();
+        if($check || $check2){
+            return response()->json(['status' => 'error','message' => 'Cannot add this user as a friend.'], 200);
+        }else{
+            $data['user_id'] = Auth::user()->id;
+            $data['friend_id'] = $id;
+            $data['status'] = 'pending';
+            $create = Friend::create($data);
+            if($create){
+                return response()->json(['status' => 'success','message' => 'Friend Request Sent.'], 200);
+            }else{
+                return response()->json(['status' => 'error','message' => 'Failed to send friend request.'], 200);
+            }
+        }
     }
 
     /**
