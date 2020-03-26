@@ -27,7 +27,7 @@
               </blockquote>
         </div>
         @foreach ($friends['active'] as $friend)
-        <div class="col-md-4 col-sm-2">
+        <div class="col-md-4 col-sm-2 active-friend-container">
             <div class="card" style="max-width: 18rem;">
                 <img class="card-img-top" style="height:10rem;" src="{{ $friend['profile_image'] }}" alt="{{ $friend['name'] }} profile image">
                 <div class="card-body">
@@ -35,7 +35,7 @@
                     <p class="card-text">{{ $friend['email'] }}</p>
                     {{-- <p>{{ $friend['accepted_on'] }}</p> --}}
                     <p class="text-success font-weight-bold p-1" >{{ ucwords($friend['status']) }}</p>
-                    <a href="#" class="btn btn-danger">Block</a>
+                <button class="btn btn-danger block-friend" data-email="{{ $friend['email'] }}" >Block</button>
                 </div>
             </div>
         </div>
@@ -103,6 +103,28 @@ $(()=>{
                alert(response.message);
             }
         });
+    });
+
+    $('.block-friend').on('click',function () { 
+        if(confirm('Are you sure you want to block this user?')){
+            const email = $(this).attr('data-email');
+            let _this = $(this);
+            $.ajax({
+                type: "post",
+                url: "{{ route('friend.block') }}",
+                data: {
+                    '_token':$('meta[name="csrf-token"]').attr('content'),
+                    email:email,
+                },
+                dataType: "json",
+                success: function (response) {
+                    if(response.status == 'success'){
+                        _this.parents('.active-friend-container').remove();
+                    }
+                    alert(response.message);
+                }
+            });
+        }
     });
 });
 </script>

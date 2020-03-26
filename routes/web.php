@@ -29,5 +29,6 @@ Route::post('/logout', 'UserController@logout')->name('logout');
 Route::resource('user', 'UserController');
 Route::resource('friend', 'FriendController');
 Route::get('/search', 'FriendController@search')->name('friend.search');
+Route::post('/block', 'FriendController@blockFriend')->name('friend.block');
 
 Route::get('/', 'DashboardController@index')->name('dashboard');

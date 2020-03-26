@@ -27,7 +27,8 @@ class FriendController extends Controller
         return view('friends.index')->with(compact('friends'));
     }
 
-    public function loggedUserFriends(){
+    public function loggedUserFriends()
+    {
         $active = $rejected = $blocked = $pending = [];
    
         $friends = Auth::user()->friends()->select('id','status','created_at AS accepted_on')->get()->toArray();
@@ -135,6 +136,28 @@ class FriendController extends Controller
             }else{
                 return response()->json(['status' => 'error','message' => 'Failed to send friend request.'], 200);
             }
+        }
+    }
+
+    public function blockFriend(Request $request)
+    {
+        $input = $request->all();
+        $email = $input['email'];
+        $data = User::select('id')->where('email',$email)->first()->toArray();
+        $id = $data['id'];
+        $check = Friend::where('user_id',Auth::user()->id)->where('friend_id',$id)->exists();
+        $check2 = Friend::where('friend_id',Auth::user()->id)->where('user_id',$id)->exists();
+        if($check){
+            $block = Friend::where('user_id',Auth::user()->id)->where('friend_id',$id)->update(['status' => 'blocked']);
+        }elseif($check2){
+            $block = Friend::where('friend_id',Auth::user()->id)->where('user_id',$id)->update(['status' => 'blocked']);
+        }else{
+            return response()->json(['status' => 'error','message' => 'You can only block users that are friends.'], 200);
+        }
+        if($block){
+            return response()->json(['status' => 'success','message' => 'Friend blocked successfully.'], 200);
+        }else{
+            return response()->json(['status' => 'error','message' => 'Failed to block user.'], 200);
         }
     }
 
