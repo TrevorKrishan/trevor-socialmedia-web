@@ -11,10 +11,10 @@ class Friend extends Model
     ];
 
     public function friend(){
-        return $this->belongsTo('App\User','id','user_id');
+        return $this->belongsTo('App\User','user_id');
     }
 
     public function info(){
-        return $this->belongsTo('App\User','friend_id','id');
+        return $this->belongsTo('App\User','friend_id');
     }
 }

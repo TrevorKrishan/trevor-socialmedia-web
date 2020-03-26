@@ -28,8 +28,12 @@ class FriendController extends Controller
     }
 
     public function loggedUserFriends(){
-        $friends = Auth::user()->friends()->select('id','status','created_at AS accepted_on')->get()->toArray();
         $active = $rejected = $blocked = $pending = [];
+   
+        $friends = Auth::user()->friends()->select('id','status','created_at AS accepted_on')->get()->toArray();
+
+        $friendsTo = Auth::user()->friendTo()->select('id','status','created_at AS accepted_on')->get()->toArray();
+
         for ($i=0; $i < count($friends); $i++) { 
             $info = Friend::find($friends[$i]['id'])->info()->select('name','email','profile_image')->get()->toArray();
             $friends[$i]['name'] = $info[0]['name'];
@@ -44,8 +48,8 @@ class FriendController extends Controller
                     array_push($rejected,$friends[$i]);
                     break;
 
-                case 'friends':
-                    array_push($friends,$friends[$i]);
+                case 'blocked':
+                    array_push($blocked,$friends[$i]);
                     break;
 
                 case 'pending':
@@ -56,6 +60,34 @@ class FriendController extends Controller
                     break;
             }
         }
+
+        for ($i=0; $i < count($friendsTo); $i++) { 
+            $info = Friend::find($friendsTo[$i]['id'])->friend()->select('name','email','profile_image')->get()->toArray();
+            $friendsTo[$i]['name'] = $info[0]['name'];
+            $friendsTo[$i]['email'] = $info[0]['email'];
+            $friendsTo[$i]['profile_image'] = Storage::url($info[0]['profile_image']);
+            switch ($friendsTo[$i]['status']) {
+                case 'active':
+                    array_push($active,$friendsTo[$i]);
+                    break;
+
+                case 'rejected':
+                    array_push($rejected,$friendsTo[$i]);
+                    break;
+
+                case 'blocked':
+                    array_push($blocked,$friendsTo[$i]);
+                    break;
+
+                case 'pending':
+                    array_push($pending,$friendsTo[$i]);
+                    break;
+    
+                default:
+                    break;
+            }
+        }
+
         return ['active' => $active,'rejected' => $rejected,'blocked' => $blocked,'pending' => $pending];
     }
 
@@ -67,8 +99,16 @@ class FriendController extends Controller
     public function search(Request $request)
     {
         $q = $request->query('q');
-        $data = User::select('name','email','profile_image')->where('email','like',$q)->orderBy('email')->get(10);
-        return response()->json($data, 200);
+        $friends = Auth::user()->friends()->select('id')->get()->toArray();
+        $friendsTo = Auth::user()->friendTo()->select('id')->get()->toArray();;
+        $total = array_merge($friends,$friendsTo);
+        $ids = [Auth::user()->id];
+        foreach ($total as $value) {
+            array_push($ids,$value['id']);
+        }
+        $ids = array_unique($ids);
+        $data = User::select('name','id','profile_image')->where('name','like',"%$q%")->whereNotIn('id',$ids)->orderBy('name')->take(10)->get();
+        return response()->json(['data' => $data], 200);
     }
 
     /**

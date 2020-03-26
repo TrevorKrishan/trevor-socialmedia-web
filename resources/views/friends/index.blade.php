@@ -9,13 +9,13 @@
             </blockquote>
         </div>
         <div class="col-md-8">
-            <div id="search-container">
+            <div id="search-container" class="position-relative">
                 <div id="search-bar" class="input-group">
                     {{-- <label for="search-input">Enter Email: </label> --}}
-                    <input type="text" class="form-control" id="search-input" placeholder="Enter Email (Atleast 3 characters) ">
+                    <input type="text" class="form-control" id="search-input" placeholder="Enter Name">
                 </div>
-                <div id="search-results">
-
+                <div id="search-results" style="z-index:2;" class="position-absolute w-100 d-none">
+                    <p class="bg-info p-1 text-white">Enter atleast 3 characters</p>
                 </div>
             </div>
         </div>
@@ -44,8 +44,19 @@
 </div>
 <script>
     $(()=>{
+        $("#search-input").on('focus',function(){
+            $("#search-results").removeClass('d-none');
+            
+        });
+
+        $("#search-container").on('focusout',function(){
+            $("#search-results").addClass('d-none');
+            // $("#search-input").val('');
+        });
+
         $('#search-input').on('keyup',function(){
             const value = $(this).val();
+            $("#search-results").html(`<div class="bg-info p-1"><div style="left:40%;" class="l-40 spinner-border position-relative text-white" role="status"><span class="sr-only">Loading...</span></div></div>`);
             if(value.length > 3){
                 $.ajax({
                     type: "get",
@@ -53,9 +64,24 @@
                     data: {q: value},
                     dataType: "json",
                     success: function (response) {
-                        
+                        const data = response.data;
+                        let oup;
+                        if(data && data.length > 0){
+                            oup = `<ul class="list-group list-unstyled">`;
+                            data.forEach(e => {
+                                oup += `<li class="list-group-item list-group-item-action"> 
+                                            <img style="width:10%;" src="storage/${e.profile_image}" alt="${e.name} profile image" class="img-thumbnail rounded"><span class="ml-1"> ${e.name}</span><button class="align-middle btn btn-info btn-sm text-white float-right add-friend-btn" data-id="${e.id}">Add Friend</button>
+                                            <li>`;
+                            });
+                            oup += `</ul>`;
+                        }else{
+                            oup = '<p class="bg-info p-1 text-white">No data found.</p>';
+                        }
+                        $("#search-results").html(oup);
                     }
                 });
+            }else{
+                $("#search-results").html('<p class="bg-info p-1 text-white">Enter atleast 3 characters</p>');
             }
         });
     });
