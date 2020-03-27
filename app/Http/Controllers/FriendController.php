@@ -190,9 +190,24 @@ class FriendController extends Controller
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, Friend $friend)
     {
-        //
+        $input = $request->all();
+        if($input['value'] == 'accept'){
+            $friend->status = 'active';
+            $msg = 'accpeted';
+        }elseif($input['value'] == 'reject'){
+            $friend->status = 'rejected';
+            $msg = 'rejected';
+        }else{
+            return response()->json(['status' => 'error','message' => 'Unknowm Value.'], 200);
+        }
+
+        if($friend->save()){
+            return response()->json(['status' => 'success','message' => "Friend request $msg."], 200);
+        }else{
+            return response()->json(['status' => 'error','message' => 'Failed to accept request.'], 200);
+        }
     }
 
     /**

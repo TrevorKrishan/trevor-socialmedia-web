@@ -6,3 +6,30 @@
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+
+#notification-container{
+    #notification-list{
+        background-color: #fff;
+        width: 25rem;
+        left: -11rem;
+        box-shadow: 0px 0px 2px 1px rgba(0,100,0,0.2);
+        border-radius: 3px;
+        top:9px;
+    }
+    ul{
+        li{
+            padding: 2px 5px;
+        }
+    }
+}
+#notification-container::before{
+    content: '';
+    position: absolute;
+    width: 0; 
+    height: 0; 
+    z-index: 5;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #fff;
+    left: 8px;
+}

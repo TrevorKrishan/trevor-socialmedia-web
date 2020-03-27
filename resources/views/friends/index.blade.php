@@ -44,17 +44,33 @@
 </div>
 <script>
 $(()=>{
+    window.mouseOnResult = false;
+
     $("#search-input").on('focus',function(){
         $("#search-results").removeClass('d-none');
-        
     });
 
-    $("#search-container").on('focusout',function(){
-        // $("#search-results").addClass('d-none');
+    $("#search-results").on('mouseover',function(){
+        window.mouseOnResult = true;
+    });
+
+    $("#search-results").on('mouseout',function(){
+        window.mouseOnResult = false;
+    });
+
+    $("#search-container").on('focusout',function(e){
+        if(!window.mouseOnResult){
+            $("#search-results").addClass('d-none');
         // $("#search-input").val('');
+        }
     });
 
-    $('#search-input').on('keyup',function(){
+    $('#search-input').on('keyup',function(e){
+        if(e.key === "Escape") {
+            $("#search-results").addClass('d-none');
+            return false;
+        }
+        $("#search-results").removeClass('d-none');
         const value = $(this).val();
         $("#search-results").html(`<div class="bg-info p-1"><div style="left:40%;" class="l-40 spinner-border position-relative text-white" role="status"><span class="sr-only">Loading...</span></div></div>`);
         if(value.length > 3){
@@ -70,7 +86,7 @@ $(()=>{
                         oup = `<ul class="list-group list-unstyled">`;
                         data.forEach(e => {
                             oup += `<li class="list-group-item list-group-item-action"> 
-                                        <img style="width:10%;" src="storage/${e.profile_image}" alt="${e.name} profile image" class="img-thumbnail rounded"><span class="ml-1"> ${e.name}</span><button class="align-middle btn btn-info btn-sm text-white float-right add-friend-btn" data-id="${e.id}">Add Friend</button>
+                                        <img style="width:10%;" src="storage/${e.profile_image}" alt="${e.name} profile image" class="img-thumbnail rounded"><span class="ml-1"> ${e.name}</span><button class="align-middle btn btn-info btn-sm text-white float-right mt-4 mr-4 add-friend-btn" data-id="${e.id}">Add Friend</button>
                                         <li>`;
                         });
                         oup += `</ul>`;

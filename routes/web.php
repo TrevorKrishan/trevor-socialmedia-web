@@ -25,6 +25,7 @@ Route::group(['middleware' => ['guest']], function () {
 
 Route::post('/login', 'UserController@login')->name('login');
 Route::post('/logout', 'UserController@logout')->name('logout');
+Route::get('/notification', 'UserController@notification')->name('notification');
 
 Route::resource('user', 'UserController');
 Route::resource('friend', 'FriendController');
