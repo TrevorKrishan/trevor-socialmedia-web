@@ -10907,3 +10907,115 @@ a.text-dark:focus {
   left: 8px;
 }
 
+#message-friends-list {
+  background-color: #fff;
+  overflow: scroll;
+  width: 21vw;
+  height: 92vh;
+  position: fixed;
+  top: 55px;
+}
+
+#message-friends-list .message-friend {
+  cursor: pointer;
+  padding: 1rem;
+  border-bottom: solid 1px rgba(204, 204, 204, 0.555);
+}
+
+#message-friends-list .message-friend img {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  margin-right: 0.3rem;
+}
+
+#message-friends-list .message-friend:hover {
+  background-color: rgba(204, 204, 204, 0.3);
+}
+
+#message-container {
+  background-color: #fff;
+  height: 92vh;
+  position: absolute;
+  top: 55px;
+  right: 0;
+  width: 77vw;
+}
+
+#message-container #message-header {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem;
+  border-bottom: solid 1px #cccccc;
+}
+
+#message-container #message-header #message-header-image img {
+  height: 3rem;
+  width: 3rem;
+  border-radius: 50%;
+  margin-right: 0.8rem;
+}
+
+#message-container #message-header #message-header-name {
+  font-size: 1.4rem;
+}
+
+#message-container #message-body {
+  max-height: 80%;
+  height: 80%;
+}
+
+#message-container #message-body ul {
+  list-style: none;
+  margin-top: 1rem;
+  height: 100%;
+  overflow: scroll;
+  padding: 0;
+}
+
+#message-container #message-body ul li {
+  padding: 10px 20px;
+  max-width: 35vw;
+  font-family: "Nunito", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  clear: both;
+  margin: 10px 0;
+}
+
+#message-container #message-body ul .send {
+  float: right;
+  background-color: rgba(104, 230, 104, 0.945);
+  color: #fff;
+  border-radius: 20px 20px 0 20px;
+  margin-right: 5px;
+}
+
+#message-container #message-body ul .receive {
+  float: left;
+  background-color: rgba(224, 224, 224, 0.8);
+  border-radius: 20px 20px 20px 0;
+  margin-left: 5px;
+}
+
+#message-container #message-footer {
+  position: absolute;
+  width: 100%;
+  bottom: 10px;
+}
+
+#message-container #message-footer #textbox-container {
+  display: flex;
+}
+
+#message-container #message-footer #textbox-container textarea {
+  width: 90%;
+  max-height: 90px;
+  border-radius: 6px;
+  margin-right: 5px;
+}
+
+#message-container #message-footer #textbox-container button {
+  max-height: 37px;
+}
+

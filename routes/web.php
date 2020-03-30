@@ -28,8 +28,13 @@ Route::post('/logout', 'UserController@logout')->name('logout');
 Route::get('/notification', 'UserController@notification')->name('notification');
 
 Route::resource('user', 'UserController');
+
 Route::resource('friend', 'FriendController');
 Route::get('/search', 'FriendController@search')->name('friend.search');
 Route::post('/block', 'FriendController@blockFriend')->name('friend.block');
+
+Route::get('/message', 'MessageController@index')->name('messages');
+Route::get('/message/{id}', 'MessageController@getMessages');
+Route::post('/message', 'MessageController@store')->name('messages.store');
 
 Route::get('/', 'DashboardController@index')->name('dashboard');

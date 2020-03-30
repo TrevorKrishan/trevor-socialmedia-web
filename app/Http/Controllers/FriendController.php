@@ -36,8 +36,9 @@ class FriendController extends Controller
         $friendsTo = Auth::user()->friendTo()->select('id','status','created_at AS accepted_on')->get()->toArray();
 
         for ($i=0; $i < count($friends); $i++) { 
-            $info = Friend::find($friends[$i]['id'])->info()->select('name','email','profile_image')->get()->toArray();
+            $info = Friend::find($friends[$i]['id'])->info()->select('id as friend_id','name','email','profile_image')->get()->toArray();
             $friends[$i]['name'] = $info[0]['name'];
+            $friends[$i]['friend_id'] = $info[0]['friend_id'];
             $friends[$i]['email'] = $info[0]['email'];
             $friends[$i]['profile_image'] = Storage::url($info[0]['profile_image']);
             switch ($friends[$i]['status']) {
@@ -63,8 +64,9 @@ class FriendController extends Controller
         }
 
         for ($i=0; $i < count($friendsTo); $i++) { 
-            $info = Friend::find($friendsTo[$i]['id'])->friend()->select('name','email','profile_image')->get()->toArray();
+            $info = Friend::find($friendsTo[$i]['id'])->friend()->select('id as friend_id','name','email','profile_image')->get()->toArray();
             $friendsTo[$i]['name'] = $info[0]['name'];
+            $friendsTo[$i]['friend_id'] = $info[0]['friend_id'];
             $friendsTo[$i]['email'] = $info[0]['email'];
             $friendsTo[$i]['profile_image'] = Storage::url($info[0]['profile_image']);
             switch ($friendsTo[$i]['status']) {
