@@ -87,6 +87,8 @@ $(()=>{
                 });
                 if(window.currentMessageId == friend_id){
                     $('#message-list').html(oup);
+                    let list = document.getElementById("message-list");
+                    list.scrollTop = list.scrollHeight;
                 }
             }
         });
