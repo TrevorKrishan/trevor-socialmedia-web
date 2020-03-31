@@ -19,6 +19,7 @@ class UserController extends Controller
     public function login(Request $request)
     {
         $input = $request->only('email', 'password');
+        
         if (Auth::attempt($input)) {
             return redirect('/');
         }else {
@@ -41,9 +42,12 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $input = $request->all();
+       
         $path = $request->file('profile_image')->store('profile_images');
+       
         $input['profile_image'] = $path;
         $input['password'] = Hash::make($input['password']);
+        
         if (User::create($input)) {
             return response()->json(['status' => 'success', 'message' => 'User Registerd Successfully.']);
         } else {
@@ -54,11 +58,23 @@ class UserController extends Controller
     public function notification()
     {
         $friend_request = Auth::user()->friendTo()->select('id')->where('status','pending')->latest()->limit(5)->get()->toArray();
+        
         $data = [];
+        
         for ($i=0; $i < count($friend_request); $i++) { 
-            $info = Friend::find($friend_request[$i]['id'])->friend()->select('name','profile_image')->get()->toArray();
-            array_push($data,['id'=>$friend_request[$i]['id'],'name'=>$info[0]['name'],'profile_image'=>$info[0]['profile_image']]);
+            $info = Friend::find($friend_request[$i]['id'])
+                            ->friend()
+                            ->select('name','profile_image')
+                            ->get()
+                            ->toArray();
+           
+            array_push($data,[
+                                'id'=>$friend_request[$i]['id'],
+                                'name'=>$info[0]['name'],
+                                'profile_image'=>$info[0]['profile_image']
+                            ]);
         }
+       
         if ($data) {
             return response()->json(['status' => 'success', 'data' => $data]);
         } else {

@@ -36,11 +36,17 @@ class FriendController extends Controller
         $friendsTo = Auth::user()->friendTo()->select('id','status','created_at AS accepted_on')->get()->toArray();
 
         for ($i=0; $i < count($friends); $i++) { 
-            $info = Friend::find($friends[$i]['id'])->info()->select('id as friend_id','name','email','profile_image')->get()->toArray();
+            $info = Friend::find($friends[$i]['id'])
+                            ->info()
+                            ->select('id as friend_id','name','email','profile_image')
+                            ->get()
+                            ->toArray();
+            
             $friends[$i]['name'] = $info[0]['name'];
             $friends[$i]['friend_id'] = $info[0]['friend_id'];
             $friends[$i]['email'] = $info[0]['email'];
             $friends[$i]['profile_image'] = Storage::url($info[0]['profile_image']);
+            
             switch ($friends[$i]['status']) {
                 case 'active':
                     array_push($active,$friends[$i]);
@@ -64,11 +70,17 @@ class FriendController extends Controller
         }
 
         for ($i=0; $i < count($friendsTo); $i++) { 
-            $info = Friend::find($friendsTo[$i]['id'])->friend()->select('id as friend_id','name','email','profile_image')->get()->toArray();
+            $info = Friend::find($friendsTo[$i]['id'])
+                            ->friend()
+                            ->select('id as friend_id','name','email','profile_image')
+                            ->get()
+                            ->toArray();
+            
             $friendsTo[$i]['name'] = $info[0]['name'];
             $friendsTo[$i]['friend_id'] = $info[0]['friend_id'];
             $friendsTo[$i]['email'] = $info[0]['email'];
             $friendsTo[$i]['profile_image'] = Storage::url($info[0]['profile_image']);
+            
             switch ($friendsTo[$i]['status']) {
                 case 'active':
                     array_push($active,$friendsTo[$i]);
@@ -101,16 +113,22 @@ class FriendController extends Controller
      */
     public function search(Request $request)
     {
-        $q = $request->query('q');
         $friends = Auth::user()->friends()->select('id')->get()->toArray();
         $friendsTo = Auth::user()->friendTo()->select('id')->get()->toArray();;
         $total = array_merge($friends,$friendsTo);
+
         $ids = [Auth::user()->id];
+
         foreach ($total as $value) {
             array_push($ids,$value['id']);
         }
+
         $ids = array_unique($ids);
+
+        $q = $request->query('q');
+
         $data = User::select('name','id','profile_image')->where('name','like',"%$q%")->whereNotIn('id',$ids)->orderBy('name')->take(10)->get();
+
         return response()->json(['data' => $data], 200);
     }
 
@@ -124,15 +142,19 @@ class FriendController extends Controller
     {
         $input = $request->all();
         $id = $input['id'];
+       
         $check = Friend::where('user_id',Auth::user()->id)->where('friend_id',$id)->exists();
         $check2 = Friend::where('friend_id',Auth::user()->id)->where('user_id',$id)->exists();
+       
         if($check || $check2){
             return response()->json(['status' => 'error','message' => 'Cannot add this user as a friend.'], 200);
         }else{
             $data['user_id'] = Auth::user()->id;
             $data['friend_id'] = $id;
             $data['status'] = 'pending';
+            
             $create = Friend::create($data);
+            
             if($create){
                 return response()->json(['status' => 'success','message' => 'Friend Request Sent.'], 200);
             }else{
@@ -145,17 +167,25 @@ class FriendController extends Controller
     {
         $input = $request->all();
         $email = $input['email'];
+       
         $data = User::select('id')->where('email',$email)->first()->toArray();
         $id = $data['id'];
+        
         $check = Friend::where('user_id',Auth::user()->id)->where('friend_id',$id)->exists();
         $check2 = Friend::where('friend_id',Auth::user()->id)->where('user_id',$id)->exists();
+        
         if($check){
-            $block = Friend::where('user_id',Auth::user()->id)->where('friend_id',$id)->update(['status' => 'blocked']);
+            $block = Friend::where('user_id',Auth::user()->id)
+                            ->where('friend_id',$id)
+                            ->update(['status' => 'blocked']);
         }elseif($check2){
-            $block = Friend::where('friend_id',Auth::user()->id)->where('user_id',$id)->update(['status' => 'blocked']);
+            $block = Friend::where('friend_id',Auth::user()->id)
+                            ->where('user_id',$id)
+                            ->update(['status' => 'blocked']);
         }else{
             return response()->json(['status' => 'error','message' => 'You can only block users that are friends.'], 200);
         }
+        
         if($block){
             return response()->json(['status' => 'success','message' => 'Friend blocked successfully.'], 200);
         }else{
@@ -195,6 +225,7 @@ class FriendController extends Controller
     public function update(Request $request, Friend $friend)
     {
         $input = $request->all();
+        
         if($input['value'] == 'accept'){
             $friend->status = 'active';
             $msg = 'accpeted';

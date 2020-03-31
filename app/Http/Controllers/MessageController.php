@@ -32,7 +32,9 @@ class MessageController extends Controller
             ['receiver_id', Auth::user()->id],
             ['sender_id', $id],
         ])->latest()->limit(20)->get();
+
         $messages = $messages->toArray();
+        
         for ($i=0; $i < count($messages); $i++) { 
             $created_at = Carbon::parse($messages[$i]['created_at']);
             $created_at->setTimeZone('Asia/Kolkata');
@@ -51,18 +53,24 @@ class MessageController extends Controller
     public function store(Request $request)
     {
         $input = $request->all();
+        
         $check = Friend::where('user_id',Auth::user()->id)->where('friend_id',$input['friend_id'])->where('status','active')->exists();
         $check2 = Friend::where('friend_id',Auth::user()->id)->where('user_id',$input['friend_id'])->where('status','active')->exists();
+        
         if(!$check && !$check2){
             return response()->json(['status' => 'error','message' => 'User is not a friend.'], 200);
         }
+        
         if($input['message'] == ''){
             return response()->json(['status' => 'error','message' => 'Message should not be empty.'], 200);
         }
+        
         $data['sender_id'] = Auth::user()->id;
         $data['receiver_id'] = $input['friend_id'];
         $data['message'] = $input['message'];
+        
         $store = Message::create($data);
+        
         if($store){
             return response()->json(['status' => 'success','message' => 'Message Sent.'], 200);
         }else{
