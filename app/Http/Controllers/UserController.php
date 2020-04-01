@@ -18,12 +18,17 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
         $input = $request->only('email', 'password');
         
         if (Auth::attempt($input)) {
             return redirect('/');
         }else {
-            return redirect()->back()->withErrors('Email Password does not match');
+            return redirect()->back()->withErrors(['email' => 'Invalid Combination','password' => 'Invalid Combination']);
         }
     }
 

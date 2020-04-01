@@ -108,7 +108,7 @@
         const image = document.getElementById('profile_image').files[0];
 
         //TODO: Add Validation
-        
+
 
         let data = new FormData;
         data.append('name',name);
@@ -128,7 +128,7 @@
                     location.href = 'login';
                 }
             }else if(this.status === 422){
-                alert('Validation Error');
+                alert('Validation Error.Please check your inputs and try again.');
             }
         }
 
