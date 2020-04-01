@@ -108,6 +108,7 @@
         const image = document.getElementById('profile_image').files[0];
 
         //TODO: Add Validation
+        
 
         let data = new FormData;
         data.append('name',name);
@@ -118,7 +119,7 @@
 
         let xhr = new XMLHttpRequest;
         xhr.open('POST','{{action("UserController@store")}}');
-
+        xhr.setRequestHeader('Accept', 'Application/json')
         xhr.onreadystatechange = function () {
             if(this.readyState === XMLHttpRequest.DONE && this.status === 200 ){
                 let resp = JSON.parse(this.responseText);
@@ -126,6 +127,8 @@
                 if(resp.status == 'success'){
                     location.href = 'login';
                 }
+            }else if(this.status === 422){
+                alert('Validation Error');
             }
         }
 

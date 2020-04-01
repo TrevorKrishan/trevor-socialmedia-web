@@ -41,6 +41,13 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required',
+            'profile_image' => 'file',
+        ]);
+
         $input = $request->all();
        
         $path = $request->file('profile_image')->store('profile_images');
