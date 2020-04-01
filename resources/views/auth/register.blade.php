@@ -127,7 +127,7 @@
                 if(resp.status == 'success'){
                     location.href = 'login';
                 }
-            }else if(this.status === 422){
+            }else if(this.readyState === XMLHttpRequest.DONE && this.status === 422){
                 alert('Validation Error.Please check your inputs and try again.');
             }
         }

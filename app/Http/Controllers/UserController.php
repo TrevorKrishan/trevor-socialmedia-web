@@ -50,13 +50,12 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required',
-            'profile_image' => 'file',
+            'profile_image' => 'required|file',
         ]);
-
-        $input = $request->all();
        
         $path = $request->file('profile_image')->store('profile_images');
        
+        $input = $request->all();
         $input['profile_image'] = $path;
         $input['password'] = Hash::make($input['password']);
         
