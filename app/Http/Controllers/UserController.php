@@ -46,20 +46,34 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required',
-            'profile_image' => 'required|file',
-        ]);
-       
+        try {
+            $request->validate([
+                'name' => 'required',
+                'email' => 'required|email|unique:users',
+                'password' => 'required',
+                'profile_image' => 'required|file',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Server Validation Error.']);
+        }
+        
+       try {
         $path = $request->file('profile_image')->store('profile_images');
+       } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => 'Image Upload Error.']);
+       }
        
         $input = $request->all();
         $input['profile_image'] = $path;
         $input['password'] = Hash::make($input['password']);
         
-        if (User::create($input)) {
+        try {
+            $create = User::create($input);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Server Error Registring User.']);
+        }
+
+        if ($create) {
             return response()->json(['status' => 'success', 'message' => 'User Registerd Successfully.']);
         } else {
             return response()->json(['status' => 'error', 'message' => 'Failed To Register User.']);

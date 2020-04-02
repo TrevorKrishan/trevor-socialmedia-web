@@ -28,20 +28,15 @@ class UserTest extends TestCase
         Storage::fake('profile_images');
        
         $data['name'] =  'John Doe';
-        $data['email'] =  'johndoe@testing.com';
+        $data['email'] =  'johndoe1@testing.com';
         $data['password'] =  '12345678';
         $data['profile_image'] =  UploadedFile::fake()->image('photo1.jpg');
         
-        $response = $this->json('POST', '/user', [
-            $data
-        ]);
+        $response = $this->json('POST', '/user',$data);
 
-        $response->assertJson(['status' => 'success', 'message' => 'User Registerd Successfully.']);
-        // $this->assertInstanceOf(User::class, $user);
-        // $this->assertEquals($data['name'], $user->name);
-        // $this->assertEquals($data['email'], $user->email);
-        // $this->assertEquals($data['profile_image'], $user->profile_image);
-
-        // Storage::disk('profile_images')->assertExists('photo1.jpg');
+        $response->assertStatus(200);
+        $response->assertJson(['status' => 'success']);
+        $response->assertJson(['message' => 'User Registerd Successfully.']);
+        
     }
 }
