@@ -18,10 +18,14 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Server Validation Error.']);
+        }
 
         $input = $request->only('email', 'password');
         
@@ -58,9 +62,9 @@ class UserController extends Controller
         }
         
        try {
-        $path = $request->file('profile_image')->store('profile_images');
+            $path = $request->file('profile_image')->store('profile_images');
        } catch (\Exception $e) {
-        return response()->json(['status' => 'error', 'message' => 'Image Upload Error.']);
+            return response()->json(['status' => 'error', 'message' => 'Image Upload Error.']);
        }
        
         $input = $request->all();
@@ -82,7 +86,14 @@ class UserController extends Controller
 
     public function notification()
     {
-        $friend_request = Auth::user()->friendTo()->select('id')->where('status','pending')->latest()->limit(5)->get()->toArray();
+        $friend_request = Auth::user()
+                                ->friendTo()
+                                ->select('id')
+                                ->where('status','pending')
+                                ->latest()
+                                ->limit(5)
+                                ->get()
+                                ->toArray();
         
         $data = [];
         
