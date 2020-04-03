@@ -153,8 +153,12 @@ class FriendController extends Controller
             $data['friend_id'] = $id;
             $data['status'] = 'pending';
             
-            $create = Friend::create($data);
-            
+            try{
+                $create = Friend::create($data);
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'error','message' => 'Server Error. Failed to send Request.'], 200);
+            }
+
             if($create){
                 return response()->json(['status' => 'success','message' => 'Friend Request Sent.'], 200);
             }else{

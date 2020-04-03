@@ -20,6 +20,7 @@ class MessageController extends Controller
     public function index()
     {
         $friends = app(FriendController::class)->loggedUserFriends();
+
         return view('messages.index')->with(compact('friends'));
     }
 
@@ -37,8 +38,11 @@ class MessageController extends Controller
         
         for ($i=0; $i < count($messages); $i++) { 
             $created_at = Carbon::parse($messages[$i]['created_at']);
+            
             $created_at->setTimeZone('Asia/Kolkata');
+            
             $messages[$i]['created_at'] =  $created_at->format('d-m-Y h:i a');
+            
             if($messages[$i]['sender_id'] == Auth::user()->id){
                 $messages[$i]['type'] = 'send';
             }else{
@@ -54,10 +58,18 @@ class MessageController extends Controller
     {
         $input = $request->all();
         
-        $check = Friend::where('user_id',Auth::user()->id)->where('friend_id',$input['friend_id'])->where('status','active')->exists();
-        $check2 = Friend::where('friend_id',Auth::user()->id)->where('user_id',$input['friend_id'])->where('status','active')->exists();
-        
-        if(!$check && !$check2){
+        $check = Friend::where([
+                            ['user_id',Auth::user()->id],
+                            ['friend_id',$input['friend_id']],
+                        ])
+                        ->orWhere([
+                            ['friend_id',Auth::user()->id],
+                            ['user_id',$input['friend_id']],
+                        ])
+                        ->where('status','active')
+                        ->exists();
+
+        if(!$check){
             return response()->json(['status' => 'error','message' => 'User is not a friend.'], 200);
         }
         
@@ -69,7 +81,11 @@ class MessageController extends Controller
         $data['receiver_id'] = $input['friend_id'];
         $data['message'] = $input['message'];
         
-        $store = Message::create($data);
+        try {
+            $store = Message::create($data);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error','message' => 'Server Error. Failed to send Message.'], 200);
+        }
         
         if($store){
             return response()->json(['status' => 'success','message' => 'Message Sent.'], 200);
