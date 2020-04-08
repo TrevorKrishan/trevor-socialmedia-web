@@ -50,16 +50,16 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        try {
+        // try {
             $request->validate([
                 'name' => 'required',
                 'email' => 'required|email|unique:users',
                 'password' => 'required',
                 'profile_image' => 'required|file',
             ]);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Server Validation Error.']);
-        }
+        // } catch (\Exception $e) {
+        //     return response()->json(['status' => 'error', 'message' => 'Server Validation Error.']);
+        // }
         
        try {
             $path = $request->file('profile_image')->store('profile_images');
